@@ -1,7 +1,3 @@
-// (function(context) {
-
-// })(window);
-
 var current = 0;
 
 var clues = [
@@ -19,23 +15,32 @@ var clues = [
         position: 2,
         message: 'do this other thing',
         code: 'DEF'
+    },
+    {
+        position: 3,
+        message: 'The end!'
     }
 ];
 
 function createClueBlock(clue) {
+    var clueBlock = '<div class="clue" id="' + clue.position + '"><p>' 
+    + clue.message + '</p>';
 
+    (clue.code && clue.code.length) ? $('.code').removeClass('hide') : $('.code').addClass('hide');
+    
+    if (clue.position < clues.length-1) {
+        clueBlock = clueBlock + '<button>Next clue!</button></div>';
+    }
+
+    return clueBlock;
 }
 
 function updateClue(clue) {
-    // var clueBlock = createClueBlock(clue);
-    var clueBlock = '<div class="clue" id="' + clue.position + '"><p>' 
-    + clue.message + '</p><button>Next clue!</button></div>';
+    $('body').append(createClueBlock(clue));
 
-    $('body').append(clueBlock);
-
-    setupClueClick();
-
-    // + '<p>' + clue.message + '</p><button>Next clue!</button></div>'
+    if (clue.position < clues.length-1) {
+        setupClueClick();
+    }
 }
 
 function removeCurrent() {
@@ -46,7 +51,6 @@ function goNext() {
     console.log('next!' , current);
     removeCurrent();
     current++;
-    // var clue = clues[current];  
     updateClue(clues[current]);
 }
 
@@ -55,17 +59,31 @@ function startClick() {
 }
 
 function setupStartButton() {
-    // <button class="start">Start here!</button>
+    $('body').append('<input class="code hide"></input>');
     $('body').append('<button class="start" id="0">Start here!</button>');
 }
 
-function clueCLick() {
-    alert('a clue!');
-    goNext();
+function clearCodeField(newVal = '') {
+    $('input.code').val(newVal);
+}
+
+function clueClick() {
+    var clue = clues[current];
+    if (clue.code && clue.code.length) {
+        if ($('input.code').val() == clue.code) {
+            goNext();
+            clearCodeField();
+        } else {
+            clearCodeField('Wrong code!')
+            setTimeout(function() {
+                clearCodeField()
+            }, 2000);
+        }
+    }
 }
 
 function setupClueClick() {
-    $('.clue').click(clueCLick);
+    $('.clue').click(clueClick);
 }
 
 function setupButtonClick() {
@@ -73,7 +91,6 @@ function setupButtonClick() {
 }
 
 var start = function() {
-    // console.log('nora go');
     setupStartButton();
     setupButtonClick();
 }
